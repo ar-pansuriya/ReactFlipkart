@@ -1,95 +1,122 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { IoPencil } from 'react-icons/io5'
 import { MdDelete } from 'react-icons/md'
 import { FaArrowRightArrowLeft, FaMagnifyingGlass } from 'react-icons/fa6'
 import { FaDownload, FaPlus } from 'react-icons/fa'
 import Sidebar from '../../Components/AdminComponents/Sidebar'
 import { useDispatch, useSelector } from 'react-redux'
-import { addAdminProduct, addCategories } from '../../ReduxToolKit/AllSlice'
+import { addAdminProduct } from '../../ReduxToolKit/AdminSlice'
 import api from '../../Utils/api'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 
-const products = [
-    {
-        id: 1,
-        name: 'Organize Basic Set',
-        price: '$149',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-01.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-    {
-        id: 2,
-        name: 'Organize Pen Holder',
-        price: '$15',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-02.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-    {
-        id: 3,
-        name: 'Organize Sticky Note',
-        price: '$15',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-03.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-    {
-        id: 4,
-        name: 'Organize Phone Holder',
-        price: '$15',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-04.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-    {
-        id: 5,
-        name: 'Organize Sticky Note',
-        price: '$15',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-03.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-    {
-        id: 6,
-        name: 'Organize Phone Holder',
-        price: '$15',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-04.jpg',
-        imageAlt: 'TODO',
-        href: '#',
-    },
-]
 
 function ProductList() {
     const dispatch = useDispatch();
-    const navigate=useNavigate()
+    const navigate = useNavigate()
+    const Product = useSelector(state => state.adminProduct.addAdminProduct)
 
-  const products = useSelector(state => state.AllStore.adminProduct);
-  console.log(products, 'products');
 
-  useEffect(() => {
-    const fetchProducts = async () => {
+    const [products, setProducts] = useState([]);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+
+    const fetchProducts = async (page) => {
+        setLoading(true);
         try {
-         const token=localStorage.getItem('token')
-          
-                const { data } = await api.get('/products',token);
-                console.log("data",data)
-               
-                console.log(data);
-                dispatch(addAdminProduct(data.data));
-        } catch (error) {
-            const token = error?.response?.data?.token
-            if(!token){
-                localStorage.removeItem('token')
-                return navigate('/admin')
+            const token = localStorage.getItem('token')
+
+            const response = await api.get(`/products?pageNumber=${page}&pageSize=20`, token);
+
+            if (response.data.success == true) {
+                const newProducts = response.data.data;
+                dispatch(addAdminProduct(newProducts));
+
+                setProducts(prevProducts => [...prevProducts, ...response.data.data]);
+                // dispatch(addAdminProduct(prevProducts => [...prevProducts, ...response.data.data]))
+            } else {
+                setHasMore(false); // No more data to load
             }
+        } catch (error) {
+
+            const token = error?.response?.data?.token
+            if (token == false) {
+                console.log('first')
+                localStorage.removeItem('token')
+                navigate('/admin')
+            }
+            if (error?.response?.data?.success == false) {
+                setHasMore(false);
+            }
+
             console.error('Failed to fetch products', error);
+        } finally {
+            setLoading(false);
         }
     };
-    fetchProducts();
-}, []);
 
+
+    useEffect(() => {
+        fetchProducts(pageNumber);
+    }, [pageNumber]);
+
+    const handleScroll = useCallback(() => {
+        if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500 && !loading && hasMore) {
+            setPageNumber(prevPageNumber => prevPageNumber + 1);
+        }
+    }, [loading, hasMore]);
+
+    const debounce = (func, delay) => {
+        let debounceTimer;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
+    };
+
+    useEffect(() => {
+        const debouncedHandleScroll = debounce(handleScroll, 200);
+        window.addEventListener('scroll', debouncedHandleScroll);
+        return () => window.removeEventListener('scroll', debouncedHandleScroll);
+    }, [handleScroll]);
+
+
+    async function hanlderDelete(e) {
+
+        try {
+            const token = localStorage.getItem('token')
+
+            const id = e
+            const response = await axios.delete(`http://localhost:3000/api/products/${e}`)
+
+            if (response.data.success == true) {
+                toast.success(response.data.message)
+                setProducts(prevProducts => prevProducts.filter(product => product.productId !== id));
+            }
+
+        } catch (error) {
+
+            const token = error?.response?.data?.token
+            if (token == false) {
+                console.log('first')
+                localStorage.removeItem('token')
+                navigate('/admin')
+            }
+            if (error?.response?.data?.success == false) {
+toast(error?.response?.data?.message)
+                }
+
+            console.error('Failed to fetch products', error);
+        }
+
+
+    }
 
     return (
         <>
@@ -150,31 +177,35 @@ function ProductList() {
 
 
                             <div className="-mx-px grid grid-cols-1 gap-4 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
-                                {products.map((product,index) => (
+                                {products.map((product, index) => (
                                     <div key={index} className="group relative border-2 rounded-lg border-gray-200 p-4 sm:p-6">
                                         <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 group-hover:opacity-75">
                                             <img
-                                                alt={`http://localhost:3000${product.productImages[0]}`}
+                                                alt="product"
                                                 src={`http://localhost:3000${product.productImages[0]}`}
                                                 className="h-full w-full object-cover object-center"
                                             />
                                         </div>
                                         <div className="pb-4 pt-10 text-center">
                                             <h3 className="text-sm font-medium text-gray-900 text-start">
-                                                <a href={product.href}>
-                                                    <span aria-hidden="true" className="absolute inset-0" />
-                                                    {product.productName}
-                                                </a>
+                                                <span aria-hidden="true" className="absolute " />
+                                                {product.productName}
                                             </h3>
                                             <p className="mt-2 text-base font-medium text-gray-900 text-start">{product.price}</p>
                                             <div className="flex flex-wrap justify-start gap-2 mt-2">
+
+                                                <a href={`add-product?productId=${product.productId}`}>
+                                                    <button
+                                                        className="flex items-center px-3 py-1 border-2 border-gray-100 font-semibold rounded-lg bg-white hover:bg-gray-100 cursor-pointer"
+                                                    >
+                                                        <IoPencil className="h-4 w-4 mr-2" />
+                                                        Edit
+                                                    </button>
+                                                </a>
+
+
                                                 <button
-                                                    className="flex items-center px-3 py-1 border-2 border-gray-100 font-semibold rounded-lg bg-white hover:bg-gray-100"
-                                                >
-                                                    <IoPencil className="h-4 w-4 mr-2" />
-                                                    Edit
-                                                </button>
-                                                <button
+                                                    onClick={() => { hanlderDelete(product.productId) }}
                                                     className="flex items-center px-3 py-1 border-2 border-gray-100 font-semibold rounded-lg bg-white hover:bg-red-100 text-red-500"
                                                 >
                                                     <MdDelete className="h-4 w-4 mr-2" />
