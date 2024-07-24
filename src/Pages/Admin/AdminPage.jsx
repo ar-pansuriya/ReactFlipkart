@@ -12,23 +12,25 @@ export default function AdminPage() {
 
     useEffect(() => {
         if (token === null) {
-            navigate('/admin')
+            return navigate('/admin')
         }
-        
-    }, [token, navigate])
+        else
+        {
+            console.log('token',token)
+            navigate('/admin/productlist')
+        }
+    }, [token])
 
     return (
         <>
             <Routes>
-                {token !== null ? (
-                    <>
-                        <Route path='/add-product' element={<AddProduct />} />
-                        <Route path='/order' element={<Order />} />
-                        <Route path='/productlist' element={<ProductList />} />
-                    </>
-                ) : (
+
+                <>
                     <Route path='/' element={<AdminLogin />} />
-                )}
+                    <Route path='/add-product' element={<AddProduct />} />
+                    <Route path='/order' element={<Order />} />
+                    <Route path='/productlist' element={<ProductList />} />
+                </>
             </Routes>
         </>
     )

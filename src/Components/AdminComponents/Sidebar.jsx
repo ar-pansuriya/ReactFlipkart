@@ -23,7 +23,7 @@ import { HiTemplate } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 
 const navigation = [
-    { name: 'Dashboard', href: '#', icon: MdDashboard, current: false },
+    { name: 'Dashboard', href: '/admin/productlist', icon: MdDashboard, current: false },
     { name: 'Products', href: '/admin/productlist', icon: HiTemplate, current: false, submenu: [{ name: 'Add Product', href: '/admin/add-product' }, { name: 'Product list', href: '#' }, { name: 'Categories', href: '#' }, { name: 'Brands', href: '#' }] },
     { name: 'Orders', href: '/admin/order', icon: IoCartOutline, current: false },
     { name: 'Customers', href: '#', icon: MdPeople, current: false, submenu: [{ name: 'All Customers', href: '#' }, { name: 'Add Customer', href: '#' }] },
@@ -153,8 +153,8 @@ function Sidebar() {
                                 <ul role="list" className="-mx-2 space-y-1">
                                     {navigation.map((item) => (
                                         <li key={item.name}>
-                                            <a
-                                                href={item.href}
+                                            <Link
+                                                to={item.href}
                                                 className={classNames(
                                                     item.current
                                                         ? 'bg-[#e8f0fd] text-[#3069ea]'
@@ -170,7 +170,7 @@ function Sidebar() {
                                                     )}
                                                 />
                                                 {item.name}
-                                            </a>
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>

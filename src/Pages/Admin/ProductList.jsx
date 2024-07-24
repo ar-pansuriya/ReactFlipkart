@@ -7,9 +7,10 @@ import Sidebar from '../../Components/AdminComponents/Sidebar'
 import { useDispatch, useSelector } from 'react-redux'
 import { addAdminProduct } from '../../ReduxToolKit/AdminSlice'
 import api from '../../Utils/api'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import Spinner from '../NotFoundPage/Spinner'
 
 
 
@@ -24,6 +25,8 @@ function ProductList() {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
+
+console.log(products)
 
     const fetchProducts = async (page) => {
         setLoading(true);
@@ -61,7 +64,9 @@ function ProductList() {
 
 
     useEffect(() => {
+        setTimeout(() => {
         fetchProducts(pageNumber);
+        }, 1000);
     }, [pageNumber]);
 
     const handleScroll = useCallback(() => {
@@ -90,10 +95,14 @@ function ProductList() {
     async function hanlderDelete(e) {
 
         try {
+            setLoading(true)
             const token = localStorage.getItem('token')
 
             const id = e
-            const response = await axios.delete(`http://localhost:3000/api/products/${e}`)
+            const response = await axios.delete(`http://localhost:3000/api/products/${e}`,{ headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            }})
 
             if (response.data.success == true) {
                 toast.success(response.data.message)
@@ -109,10 +118,12 @@ function ProductList() {
                 navigate('/admin')
             }
             if (error?.response?.data?.success == false) {
-toast(error?.response?.data?.message)
-                }
+                toast(error?.response?.data?.message)
+            }
 
             console.error('Failed to fetch products', error);
+        } finally {
+            setLoading(false)
         }
 
 
@@ -134,7 +145,8 @@ toast(error?.response?.data?.message)
                                         Export
                                     </button>
 
-                                    <button className="flex items-center text-white px-3 py-2 rounded-md border-2 bg-[#3069ea] border-[#3069ea] focus:outline-none focus:ring-opacity-75 text-sm">
+                                    <button className="flex items-center text-white px-3 py-2 rounded-md border-2 bg-[#3069ea] border-[#3069ea] focus:outline-none focus:ring-opacity-75 text-sm"
+                                        onClick={() => { navigate('/admin/add-product') }}>
                                         <FaPlus className="h-4 w-4 mr-2" />
                                         Create New
                                     </button>
@@ -194,14 +206,14 @@ toast(error?.response?.data?.message)
                                             <p className="mt-2 text-base font-medium text-gray-900 text-start">{product.price}</p>
                                             <div className="flex flex-wrap justify-start gap-2 mt-2">
 
-                                                <a href={`add-product?productId=${product.productId}`}>
+                                                <Link to={`/admin/add-product?productId=${product.productId}`}>
                                                     <button
                                                         className="flex items-center px-3 py-1 border-2 border-gray-100 font-semibold rounded-lg bg-white hover:bg-gray-100 cursor-pointer"
                                                     >
                                                         <IoPencil className="h-4 w-4 mr-2" />
                                                         Edit
                                                     </button>
-                                                </a>
+                                                </Link>
 
 
                                                 <button
@@ -218,6 +230,11 @@ toast(error?.response?.data?.message)
                             </div>
                         </div>
                     </div>
+                    {loading && (
+                            <div className='w-full flex justify-center mt-4 mb-4 py-4'>
+                                <Spinner />
+                            </div>
+                        )}
                 </div>
             </main>
         </>

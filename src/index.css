@@ -426,3 +426,22 @@ body {
 input {
   outline: none;
 }
+
+
+/* src/App.css */.table-responsive {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.nested-table th, .nested-table td {
+    padding: 4px 8px;
+}
+
+.thead-dark th {
+    background-color: #343a40;
+    color: white;
+}
