@@ -5,8 +5,14 @@ import { BsCart3 } from "react-icons/bs";
 import { IoSearch } from "react-icons/io5";
 import Logo from '/Images/logo.svg';
 import { MdOutlinePhoneIphone } from 'react-icons/md';
+import { FaCartPlus } from 'react-icons/fa6';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
+
+  const addToCartLength = useSelector(state=>state.AllStore.addToCart);
+  const navigate = useNavigate();
   return (
     <div className='max-w-[1600px] mx-auto'>
       <div className='flex justify-between p-[8px_16px]'>
@@ -23,7 +29,14 @@ export default function Navbar() {
         <div className='flex items-center sm:gap-[20px] gap-[12px]'>
           <MdOutlinePhoneIphone className='scale-110' />
           <button className='flex items-center sm:gap-[10px] gap-1'><LuUserCircle2 className='text-[22px]' /> <span>Login</span></button>
-          <button className='text-[22px]'><BsCart3 /></button>
+          <div className="relative">
+            <button onClick={()=>navigate('/order-summary')} className="text-[22px]">
+              <FaCartPlus />
+            </button>
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              {addToCartLength.length}
+            </span>
+          </div>
         </div>
       </div>
       <div className='sm:px-[40px] px-[16px] mt-[4px]'>

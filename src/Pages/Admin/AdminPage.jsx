@@ -5,6 +5,7 @@ import AddProduct from './AddProduct'
 import ProductList from './ProductList'
 import Order from './Order'
 import api from '../../Utils/api'
+import AdminDetail from '../../Components/AdminComponents/AdminDetail'
 
 export default function AdminPage() {
     const navigate = useNavigate()
@@ -30,6 +31,7 @@ export default function AdminPage() {
                     <Route path='/add-product' element={<AddProduct />} />
                     <Route path='/order' element={<Order />} />
                     <Route path='/productlist' element={<ProductList />} />
+                    <Route path='/detail' element={<AdminDetail />} />
                 </>
             </Routes>
         </>

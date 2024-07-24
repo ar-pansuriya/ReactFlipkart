@@ -21,11 +21,13 @@ import { BiSolidComment } from 'react-icons/bi';
 import { AiOutlineGlobal } from 'react-icons/ai';
 import { HiTemplate } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import { RiAdminFill } from 'react-icons/ri';
 
 const navigation = [
     { name: 'Dashboard', href: '/admin/productlist', icon: MdDashboard, current: false },
     { name: 'Products', href: '/admin/productlist', icon: HiTemplate, current: false, submenu: [{ name: 'Add Product', href: '/admin/add-product' }, { name: 'Product list', href: '#' }, { name: 'Categories', href: '#' }, { name: 'Brands', href: '#' }] },
     { name: 'Orders', href: '/admin/order', icon: IoCartOutline, current: false },
+    { name: 'AdminDetail', href: '/admin/detail', icon: RiAdminFill, current: false },
     { name: 'Customers', href: '#', icon: MdPeople, current: false, submenu: [{ name: 'All Customers', href: '#' }, { name: 'Add Customer', href: '#' }] },
     { name: 'Statistics', href: '#', icon: FaChartSimple, current: false },
     { name: 'Review', href: '#', icon: BiSolidComment, current: false },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { IoPencil } from 'react-icons/io5'
 import { MdDelete } from 'react-icons/md'
-import { FaArrowRightArrowLeft, FaMagnifyingGlass } from 'react-icons/fa6'
+import { FaArrowRightArrowLeft } from 'react-icons/fa6'
 import { FaDownload, FaPlus } from 'react-icons/fa'
 import Sidebar from '../../Components/AdminComponents/Sidebar'
 import { useDispatch, useSelector } from 'react-redux'
@@ -185,9 +185,6 @@ console.log(products)
 
                                 </div>
                             </div>
-
-
-
                             <div className="-mx-px grid grid-cols-1 gap-4 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
                                 {products.map((product, index) => (
                                     <div key={index} className="group relative border-2 rounded-lg border-gray-200 p-4 sm:p-6">

@@ -279,47 +279,48 @@ function AddProduct() {
                                                 />
                                             </div>
                                         </div>
-
-{
-    !productId && 
-    productImages.map((image, index) => (
-        <><div key={index} className="relative group rounded-md overflow-hidden">
-            <img
-                src={URL.createObjectURL(image)}
-                alt="Product"
-                className="w-full h-auto rounded-md border-2 border-gray-300 group-hover:opacity-50 transition duration-300" />
-            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition duration-300"></div>
-            <div className="absolute bottom-2 left-[1.5rem] flex gap-2 opacity-0 group-hover:opacity-100 transition duration-300">
-                <button
-                    type="button"
-                    className="bg-white text-gray-500 rounded-full p-1"
-                    onClick={() => handleImageDelete(index)}
-                >
-                    <BsTrash className="h-4 w-4" />
-                </button>
-            </div>
-        </div><div className="flex justify-center items-center col-span-1">
-                <div className="w-full max-w-xs flex flex-col items-center h-full">
-                    <label className="relative w-full h-full image-class sm:h-[80px] xs:h-[60px] flex flex-col items-center justify-center border-2 border-gray-300 rounded-md bg-gray-100 hover:border-gray-300">
-                        <input
-                            type="file"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                            onChange={handleImageUpload}
-                            accept=".jpeg, .jpg, .png"
-                            multiple />
-                        <div className="flex flex-col items-center justify-center">
-                            <MdCloudUpload className="h-6 w-6 text-gray-500" />
-                            <span className="mt-2 text-gray-500">Upload</span>
-                        </div>
-                    </label>
-                </div>
-            </div></>
-    ))
-}
-
-                                       
-                                      
-
+                                        {
+                                            console.log(productImages)
+                                        }
+                                        {
+                                            productImages.map((image, index) => (
+                                                <div key={index} className="relative group rounded-md overflow-hidden">
+                                                    <img
+                                                        src={URL.createObjectURL(image)}
+                                                        alt="Product"
+                                                        className="w-full h-auto rounded-md border-2 border-gray-300 group-hover:opacity-50 transition duration-300" />
+                                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition duration-300"></div>
+                                                    <div className="absolute bottom-2 left-[1.5rem] flex gap-2 opacity-0 group-hover:opacity-100 transition duration-300">
+                                                        <button
+                                                            type="button"
+                                                            className="bg-white text-gray-500 rounded-full p-1"
+                                                            onClick={() => handleImageDelete(index)}
+                                                        >
+                                                            <BsTrash className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }{
+                                            productId === null && (
+                                                <div className="flex justify-center items-center col-span-1">
+                                                    <div className="w-full max-w-xs flex flex-col items-center h-full">
+                                                        <label className="relative w-full h-full image-class sm:h-[80px] xs:h-[60px] flex flex-col items-center justify-center border-2 border-gray-300 rounded-md bg-gray-100 hover:border-gray-300">
+                                                            <input
+                                                                type="file"
+                                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                onChange={handleImageUpload}
+                                                                accept=".jpeg, .jpg, .png"
+                                                                multiple />
+                                                            <div className="flex flex-col items-center justify-center">
+                                                                <MdCloudUpload className="h-6 w-6 text-gray-500" />
+                                                                <span className="mt-2 text-gray-500">Upload</span>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
                                         <div className="sm:col-span-3 gap-3">
                                             <label htmlFor="country" className="block text-sm font-medium leading-6 text-gray-900">
                                                 Category
