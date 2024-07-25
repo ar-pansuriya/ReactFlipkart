@@ -99,7 +99,7 @@ console.log(products)
             const token = localStorage.getItem('token')
 
             const id = e
-            const response = await axios.delete(`http://localhost:3000/api/products/${e}`,{ headers: {
+            const response = await axios.delete(`http://157.245.105.187/api/products/${e}`,{ headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`
             }})
