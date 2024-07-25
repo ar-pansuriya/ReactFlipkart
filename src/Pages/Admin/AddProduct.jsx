@@ -49,12 +49,8 @@ function AddProduct() {
 
                 const { data } = await api.get(`/products/${productId}`)
                 const productData = data.data;
-                const baseUrl = "http://157.245.105.187";
-                //     let images=productData.productImages
-                //    let productImages=images.map(item=>baseUrl + item)
 
                 const selectedCategory = Category.find(cat => cat.id == productData.CategoryId);
-                console.log(selectedCategory, '---------')
 
                 setProductName(productData.productName || '');
                 setCategories(selectedCategory || "")
@@ -153,7 +149,7 @@ function AddProduct() {
             formData.append('color', color);
             formData.append('rank', rank);
 
-            const { data } = await axios.post(`http://157.245.105.187/api/products`, formData, {
+            const { data } = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/products`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`

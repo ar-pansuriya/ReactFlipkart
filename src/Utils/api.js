@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // Base URL from environment variable
-const BASE_URL = 'http://157.245.105.187/api';
+const BASE_URL = `${import.meta.env.VITE_BASE_URL}/api`;
 
 // Create an Axios instance
 const axiosInstance = axios.create({

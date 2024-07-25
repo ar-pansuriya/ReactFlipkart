@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../Components/AdminComponents/Sidebar';
-import { FaPlus } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import Spinner from '../NotFoundPage/Spinner';
@@ -10,11 +9,10 @@ import { useNavigate } from 'react-router-dom';
 const Order = () => {
     const [data, setData] = useState([]);
     const token = localStorage.getItem('token');
-    const [isLoading,setLoading]=useState(false)
-    const navigate=useNavigate()
-
+    const [isLoading, setLoading] = useState(false)
+    const navigate = useNavigate()
     useEffect(() => {
-        axios.get('http://localhost:3000/api/orders', {
+        axios.get(`${import.meta.env.VITE_BASE_URL}/api/orders`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`
@@ -31,7 +29,7 @@ const Order = () => {
         try {
             setLoading(true)
             const token = localStorage.getItem('token')
-            const response = await axios.delete(`http://localhost:3000/api/orders`, {
+            const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/api/orders`, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
@@ -71,13 +69,13 @@ const Order = () => {
                             Delete All Orders
                         </button>
                     </div>
-                        {isLoading && (
-                            <div className='w-full flex justify-center mt-4 mb-4 py-4'>
-                                <Spinner />
-                            </div>
-                        )}
+                    {isLoading && (
+                        <div className='w-full flex justify-center mt-4 mb-4 py-4'>
+                            <Spinner />
+                        </div>
+                    )}
                     <DynamicTable data={data} />
-                   
+
                 </div>
             </main>
         </div>
@@ -127,7 +125,7 @@ const DynamicTable = ({ data }) => {
                     ))}
                 </tbody>
             </table>
-          
+
         </div>
     );
 };
