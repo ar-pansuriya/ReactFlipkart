@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // Base URL from environment variable
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://157.245.105.187/api';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
