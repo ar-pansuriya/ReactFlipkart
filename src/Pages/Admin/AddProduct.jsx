@@ -153,7 +153,7 @@ function AddProduct() {
             formData.append('color', color);
             formData.append('rank', rank);
 
-            const { data } = await axios.post(`http://localhost:3000/api/products`, formData, {
+            const { data } = await axios.post(`http://157.245.105.187/api/products`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
