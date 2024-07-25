@@ -49,7 +49,7 @@ function AddProduct() {
 
                 const { data } = await api.get(`/products/${productId}`)
                 const productData = data.data;
-                const baseUrl = "http://localhost:3000";
+                const baseUrl = "http://157.245.105.187";
                 //     let images=productData.productImages
                 //    let productImages=images.map(item=>baseUrl + item)
 
