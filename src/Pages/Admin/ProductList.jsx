@@ -191,7 +191,7 @@ console.log(products)
                                         <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 group-hover:opacity-75">
                                             <img
                                                 alt="product"
-                                                src={`http://localhost:3000${product.productImages[0]}`}
+                                                src={`${import.meta.env.VITE_BASE_URL}${product.productImages[0]}`}
                                                 className="h-full w-full object-cover object-center"
                                             />
                                         </div>
