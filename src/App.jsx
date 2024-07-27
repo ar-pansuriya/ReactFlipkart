@@ -35,7 +35,7 @@ function App() {
       }
     };
     fetchCategories();
-  }, [categories, dispatch]);
+  }, [dispatch]);
 
 
   useEffect(() => {
