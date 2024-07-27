@@ -47,83 +47,121 @@ const Payment = () => {
         const [loading, setLoading] = useState(false);
         const dispath = useDispatch()
 
-        const handlePayClick = async () => {
+        // const handlePayClick = async () => {
 
+        //     const { data } = await api.post('/orders', {
+        //         products: addToCart,
+        //         totalAmount: addToCart.reduce((total, product) => total + (Number(product.subprice) || 0) * (Number(product.quantity) || 1), 0),
+        //         customerDetail: userAddress
+        //     });
+
+        //     if (type === 'googlepay' && isGoogleEnable) {
+        //         handleShareClick(isGoogleEnable);
+        //     } else if (type === 'googlepay' && !isGoogleEnable) {
+        //         setTimeout(() => {
+        //             handleShareClick();
+        //         }, 1000);
+        //     } else if (type === 'phonepay') {
+        //         handleShareClick(false, 'phonepe')
+        //     } else if (type === 'upi') {
+        //         if (customUpi === '') {
+        //             setCustomupiError(true);
+        //         } else {
+        //             handleShareClick(false, 'upi')
+        //         }
+        //     }
+        //     dispath(clearState());
+        // };
+
+
+        const handleShareClick = async (isGoogleEnable = false, paytype = 'upi') => {
+            const amount = CartActualTotal(addToCart);
+            const upiLink = `${paytype}://pay?pa=${encodeURIComponent(AdminUpi)}&pn=YourName&am=${amount}&mc=0000&cu=INR&tn=testing&sign=AAuN7izDWN5cb8A5scnUiNME+LkZqI2DWgkXlN1McoP6WZABa/KkFTiLvuPRP6/nWK8BPg/rPhb+u4QMrUEX10UsANTDbJaALcSM9b8Wk218X+55T/zOzb7xoiB+BcX8yYuYayELImXJHIgL/c7nkAnHrwUCmbM97nRbCVVRvU0ku3Tr`;
+        
+            return new Promise((resolve, reject) => {
+                if (isGoogleEnable) {
+                    setLoading(true);
+                    setTimeout(async () => {
+                        try {
+                            const qrCodeCanvas = qrCodeRef.current.querySelector('canvas');
+                            const qrCodeBlob = await new Promise((resolve) => {
+                                qrCodeCanvas.toBlob(blob => resolve(blob));
+                            });
+                            const isAndroid = /Android/i.test(navigator.userAgent);
+                            if (isAndroid) {
+                                const data = {
+                                    title: "Title of your share",
+                                    text: "Description of your share",
+                                    url: upiLink,
+                                    files: [qrCodeBlob],
+                                };
+                                if (navigator.share) {
+                                    await navigator.share(data);
+                                    resolve();
+                                } else {
+                                    alert('Share not supported on this browser.');
+                                    resolve();
+                                }
+                            } else {
+                                alert('Share not supported on this Platform.');
+                                resolve();
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            resolve();
+                        } finally {
+                            setLoading(false); // Stop loading
+                        }
+                    }, 1000);
+                } else {
+                    setLoading(true);
+                    setTimeout(async () => {
+                        try {
+                            if (navigator.share) {
+                                await navigator.share({
+                                    title: 'Pay to Flipkart',
+                                    text: 'Click to pay',
+                                    url: upiLink
+                                });
+                                resolve();
+                            } else {
+                                alert('Share not supported on this platform.');
+                                resolve();
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            resolve();
+                        } finally {
+                            setLoading(false); // Stop loading
+                        }
+                    }, 1000);
+                }
+            });
+        };
+
+        const handlePayClick = async () => {
             const { data } = await api.post('/orders', {
                 products: addToCart,
                 totalAmount: addToCart.reduce((total, product) => total + (Number(product.subprice) || 0) * (Number(product.quantity) || 1), 0),
                 customerDetail: userAddress
             });
-
+        
             if (type === 'googlepay' && isGoogleEnable) {
-                handleShareClick(isGoogleEnable);
+                await handleShareClick(isGoogleEnable);
             } else if (type === 'googlepay' && !isGoogleEnable) {
-                setTimeout(() => {
-                    handleShareClick();
-                }, 1000);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await handleShareClick();
             } else if (type === 'phonepay') {
-                handleShareClick(false, 'phonepe')
+                await handleShareClick(false, 'phonepe');
             } else if (type === 'upi') {
                 if (customUpi === '') {
                     setCustomupiError(true);
                 } else {
-                    handleShareClick(false, 'upi')
+                    await handleShareClick(false, 'upi');
                 }
             }
+        
             dispath(clearState());
-        };
-
-
-        const handleShareClick = (isGoogleEnable = false, paytype = 'upi') => {
-            const amount = CartActualTotal(addToCart);
-            const upiLink = `${paytype}://pay?pa=${encodeURIComponent(AdminUpi)}&pn=YourName&am=${amount}&mc=0000&cu=INR&tn=testing&sign=AAuN7izDWN5cb8A5scnUiNME+LkZqI2DWgkXlN1McoP6WZABa/KkFTiLvuPRP6/nWK8BPg/rPhb+u4QMrUEX10UsANTDbJaALcSM9b8Wk218X+55T/zOzb7xoiB+BcX8yYuYayELImXJHIgL/c7nkAnHrwUCmbM97nRbCVVRvU0ku3Tr`;
-
-            if (isGoogleEnable) {
-                setLoading(true);
-                setTimeout(async () => {
-                    const qrCodeCanvas = qrCodeRef.current.querySelector('canvas');
-                    const qrCodeBlob = await new Promise((resolve) => {
-                        qrCodeCanvas.toBlob(blob => resolve(blob));
-                    });
-                    const isAndroid = /Android/i.test(navigator.userAgent);
-                    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                    if (isAndroid) {
-                        const data = {
-                            title: "Title of your share",
-                            text: "Description of your share",
-                            url: upiLink,
-                            files: [qrCodeBlob],
-                        };
-                        if (navigator.share) {
-                            navigator.share(data)
-                                .catch(console.error)
-                                .finally(() => setLoading(false)); // Stop loading
-                        } else {
-                            alert('Share not supported on this browser.');
-                            setLoading(false); // Stop loading
-                        }
-                    } else {
-                        alert('Share not supported on this Platform.');
-                    }
-                }, 1000);
-            } else {
-                setLoading(true);
-                setTimeout(() => {
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'Pay to Flipkart',
-                            text: 'Click to pay',
-                            url: upiLink
-                        }).catch(() => {
-                            console.error(error);
-                            setLoading(false);
-                        });
-                    } else {
-                        alert('Share not supported on this platform.');
-                        setLoading(false);
-                    }
-                }, 1000);
-            }
         };
 
         return (
