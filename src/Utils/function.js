@@ -76,3 +76,10 @@ export function CartActualTotal (addToCart){
   }, 0);
   return totalPrice;
 }
+
+
+export function generateUniqueOrderId () {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Current date in YYYYMMDD format
+  const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase(); // Random alphanumeric string
+  return `ORDER-${date}-${randomPart}`;
+};

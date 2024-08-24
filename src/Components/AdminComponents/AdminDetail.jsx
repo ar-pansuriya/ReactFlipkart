@@ -14,6 +14,9 @@ export default function AdminDetail() {
         googlePixelId: '',
         username: '',
         upi: '',
+        PhonePayAPIKey: '',
+        keyIndex: "",
+        marchantId: ""
     });
 
     const [errors, setErrors] = useState({});
@@ -39,7 +42,15 @@ export default function AdminDetail() {
         if (!formData.upi) {
             errors.upi = 'UPI is required.';
         }
-
+        if (!formData.PhonePayAPIKey) {
+            errors.upi = 'PhonePayAPIKey is required.';
+        } 
+        if (!formData.marchantId) {
+            errors.upi = 'marchantId is required.';
+        } 
+        if (!formData.keyIndex) {
+            errors.upi = 'keyIndex is required.';
+        }
         return errors;
     };
 
@@ -60,7 +71,7 @@ export default function AdminDetail() {
             setIsSubmitting(true);
 
             // Simulate a network request
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
 
             setIsSubmitting(false);
 
@@ -78,6 +89,9 @@ export default function AdminDetail() {
                     googlePixelId: data.googlePixelId,
                     username: data.username,
                     upi: data.upi,
+                    keyIndex: data.keyIndex,
+                    PhonePayAPIKey: data.PhonePayAPIKey,
+                    marchantId: data.marchantId
                 }
                 setAdminId(data.adminId);
                 setFormData(newObj);
@@ -94,10 +108,10 @@ export default function AdminDetail() {
 
     const updateAdminDetail = async () => {
         const updateObj = {
-            ...formData,isGoogleEnabled:formData.isGoogleEnabled==='yes'?true:false
+            ...formData, isGoogleEnabled: formData.isGoogleEnabled === 'yes' ? true : false
         }
         try {
-            const { data } = await api.put(`/admin/${AdminId}`,updateObj);
+            const { data } = await api.put(`/admin/${AdminId}`, updateObj);
         } catch (error) {
             console.error(error.message);
         }
@@ -112,35 +126,47 @@ export default function AdminDetail() {
                         <h1 className='font-[700] text-[20px]'>Admin Detail Page</h1>
                         <div className="max-w-md mx-auto mt-10 p-6">
                             <form onSubmit={handleSubmit}>
-                                <div className="mb-4">
-                                    <label className="block text-gray-700">Is Google Enabled?</label>
-                                    <div className="flex items-center space-x-4">
-                                        <label className="inline-flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="isGoogleEnabled"
-                                                value='yes'
-                                                checked={formData.isGoogleEnabled === 'yes'}
-                                                onChange={handleChange}
-                                                className="form-radio text-blue-600"
-                                            />
-                                            <span className="ml-2">Yes</span>
-                                        </label>
-                                        <label className="inline-flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="isGoogleEnabled"
-                                                value='no'
-                                                checked={formData.isGoogleEnabled === 'no'}
-                                                onChange={handleChange}
-                                                className="form-radio text-blue-600"
-                                            />
-                                            <span className="ml-2">No</span>
-                                        </label>
+                                <div className='flex justify-between'>
+                                    <div className="mb-4">
+                                        <label className="block text-gray-700">Is Google Enabled?</label>
+                                        <div className="flex items-center space-x-4">
+                                            <label className="inline-flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="isGoogleEnabled"
+                                                    value='yes'
+                                                    checked={formData.isGoogleEnabled === 'yes'}
+                                                    onChange={handleChange}
+                                                    className="form-radio text-blue-600"
+                                                />
+                                                <span className="ml-2">Yes</span>
+                                            </label>
+                                            <label className="inline-flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="isGoogleEnabled"
+                                                    value='no'
+                                                    checked={formData.isGoogleEnabled === 'no'}
+                                                    onChange={handleChange}
+                                                    className="form-radio text-blue-600"
+                                                />
+                                                <span className="ml-2">No</span>
+                                            </label>
+                                        </div>
+                                        {errors.isGoogleEnabled && <p className="text-red-500 text-xs mt-1">{errors.isGoogleEnabled}</p>}
                                     </div>
-                                    {errors.isGoogleEnabled && <p className="text-red-500 text-xs mt-1">{errors.isGoogleEnabled}</p>}
+                                    <div className="mb-4">
+                                        <label className="block text-gray-700">Username</label>
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                        />
+                                        {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+                                    </div>
                                 </div>
-
                                 <div className="mb-4">
                                     <label className="block text-gray-700">Facebook Pixel ID</label>
                                     <input
@@ -165,16 +191,41 @@ export default function AdminDetail() {
                                     {errors.googlePixelId && <p className="text-red-500 text-xs mt-1">{errors.googlePixelId}</p>}
                                 </div>
 
+                                <div className='flex gap-2'>
+                                    <div className="mb-4">
+                                        <label className="block text-gray-700">Marchant Id</label>
+                                        <input
+                                            type="text"
+                                            name="marchantId"
+                                            value={formData.marchantId}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                        />
+                                        {errors.marchantId && <p className="text-red-500 text-xs mt-1">{errors.marchantId}</p>}
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="block text-gray-700">Key Index</label>
+                                        <input
+                                            type="text"
+                                            name="keyIndex"
+                                            value={formData.keyIndex}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                        />
+                                        {errors.keyIndex && <p className="text-red-500 text-xs mt-1">{errors.keyIndex}</p>}
+                                    </div>
+                                </div>
+
                                 <div className="mb-4">
-                                    <label className="block text-gray-700">Username</label>
+                                    <label className="block text-gray-700">PhonePay API Key</label>
                                     <input
                                         type="text"
-                                        name="username"
-                                        value={formData.username}
+                                        name="PhonePayAPIKey"
+                                        value={formData.PhonePayAPIKey}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                     />
-                                    {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+                                    {errors.PhonePayAPIKey && <p className="text-red-500 text-xs mt-1">{errors.PhonePayAPIKey}</p>}
                                 </div>
 
                                 <div className="mb-4">
@@ -191,7 +242,7 @@ export default function AdminDetail() {
 
                                 <div className="flex justify-center">
                                     <button
-                                        onClick={()=>updateAdminDetail()}
+                                        onClick={() => updateAdminDetail()}
                                         className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                         disabled={isSubmitting}
                                     >

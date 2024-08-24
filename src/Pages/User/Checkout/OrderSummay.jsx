@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaChevronRight, FaRegEnvelope } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaChevronRight, FaRegEnvelope, FaSpinner } from 'react-icons/fa';
 import { GoArrowLeft } from 'react-icons/go';
 import ProductLogo from '../../../../public/Images/product-logo.png';
 import Express from '../../../../public/Images/checkout/express.png';
@@ -8,8 +8,9 @@ import Shield from '../../../../public/Images/checkout/shield.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaTrash } from 'react-icons/fa6';
-import { calculateDiscountPercentage, calculateTotalPriceDifference, CartActualTotal, CartTotal, formatToINR, getFutureDate } from '../../../Utils/function';
+import { calculateDiscountPercentage, calculateTotalPriceDifference, CartActualTotal, CartTotal, formatToINR, generateUniqueOrderId, getFutureDate } from '../../../Utils/function';
 import { removeAddToCartProduct, updateAddCartProduct } from '../../../ReduxToolKit/AllSlice';
+import api from '../../../Utils/api';
 
 const OrderSummary = () => {
 
@@ -17,19 +18,51 @@ const OrderSummary = () => {
     const dispatch = useDispatch();
     const userAddress = useSelector(state => state.AllStore.userAddress);
     const addToCart = useSelector(state => state.AllStore.addToCart);
+    const [continueLoading, setContinueLoading] = useState(false);
 
 
     const handleQuantityChange = (e, productId) => {
         dispatch(updateAddCartProduct({ productId, quantity: e.target.value }));
     }
 
-    const handleOrderSummary = () => {
-        if (Object.keys(userAddress).length > 0 && addToCart.length > 0) {
-            navigate('/payment')
-        } else {
-            alert('Please Add Address or Products in cart')
+    const handleOrderSummary = async () => {
+        setContinueLoading(true);
+
+        try {
+            const uniqueOrderId = generateUniqueOrderId();
+            console.log(uniqueOrderId, 'uniqueOrderId');
+
+            if (Object.keys(userAddress).length > 0 && addToCart.length > 0) {
+                // Create the order
+                await api.post('/orders', {
+                    products: addToCart,
+                    uniqueOrderId,
+                    totalAmount: addToCart.reduce((total, product) => total + (Number(product.subprice) || 0) * (Number(product.quantity) || 1), 0),
+                    customerDetail: userAddress
+                });
+
+                // Initiate payment
+                const { data } = await api.post('/payment', { uniqueOrderId });
+
+                if (data.success) {
+                    // Redirect to payment URL
+                    window.location.href = data.url;
+                } else {
+                    // Handle unsuccessful payment initiation
+                    alert(`Payment initiation failed: ${data.message || 'Unknown error'}`);
+                }
+            } else {
+                alert('Please Add Address or Products in cart');
+            }
+        } catch (error) {
+            // Handle any errors that occurred during the process
+            console.error('An error occurred:', error.message);
+            alert(`An error occurred: ${error.message}`);
+        } finally {
+            setContinueLoading(false);
         }
     }
+
 
     return (
         <div className="max-w-md mx-auto bg-white">
@@ -174,7 +207,17 @@ const OrderSummary = () => {
                     <span className="text-xl text-[#212121] block leading-[22px]">{formatToINR(CartActualTotal(addToCart))}</span>
                     <button className="text-[#2a55e5] text-[14px]">View price details</button>
                 </div>
-                <button onClick={() => handleOrderSummary()} className="px-4 py-2 bg-[#ffc200] max-w-[168px] w-full rounded">Continue</button>
+                <button
+                    onClick={() => handleOrderSummary()}
+                    className={`px-4 py-2 max-w-[168px] w-full rounded flex items-center justify-center ${continueLoading ? 'bg-gray-300' : 'bg-[#ffc200]'} transition-colors duration-300`}
+                    disabled={continueLoading} // Disable button when loading
+                >
+                    {continueLoading ? (
+                        <FaSpinner className="animate-spin text-white" />
+                    ) : (
+                        'Continue'
+                    )}
+                </button>
             </div>
         </div>
     );

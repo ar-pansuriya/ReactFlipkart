@@ -6,13 +6,14 @@ import Navbar from '../../../Components/UserComponents/Navbar/Navbar';
 import ProductLogo from '/Images/product-logo.png';
 import Shirt from '/Images/menshirt.webp';
 import { IoHeart } from 'react-icons/io5';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCategoryPage, addProductDetail } from '../../../ReduxToolKit/AllSlice';
+import { addCategoryPage, addProductDetail, clearState } from '../../../ReduxToolKit/AllSlice';
 import Spinner from '../../Reusable/Spinner';
 import NoMoreProducts from '../../Reusable/NoMoreProducts';
 import { calculateDiscountPercentage, formatToINR, generateRandomNumber } from '../../../Utils/function';
 import api from '../../../Utils/api';
+import Popup from '../../Reusable/Popup';
 
 export default function UserHome() {
     const settings = {
@@ -92,10 +93,31 @@ export default function UserHome() {
     const categories = useSelector(state => state.AllStore.categories);
     const [pageNumber, setPageNumber] = useState(1);
     const [error, setError] = useState('');
+    const location = useLocation();
+    const [status, setStatus] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
     const [allProducts, setAllProducts] = useState([]);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const paymentStatus = queryParams.get('status');
+        if (paymentStatus === 'COMPLETED') {
+            dispatch(clearState());
+        }
+        if (paymentStatus === 'COMPLETED' || paymentStatus === 'FAILED') {
+            setStatus(paymentStatus);
+            setShowPopup(true);
+        }
+    }, [location.search]);
+
+    const closePopup = () => {
+        setShowPopup(false);
+        // Remove the query parameters from the URL
+        navigate(location.pathname, { replace: true });
+    };
 
     const handleLinkClick = (name) => {
         let linkdata;
@@ -184,18 +206,20 @@ export default function UserHome() {
                     </Slider>
                 </div>
             </div>
-            <Link to={'/category'} className='flex items-center justify-center flex-wrap pb-[20px] bg-[#f9d6c0]'>
-                {ProductData.map((val, index) => (
-                    <div key={index} className='text-center'>
-                        <img
-                            onClick={() => handleLinkClick(val.description)}
-                            src={val.img}
-                            alt="product"
-                            className={`w-[70px] ${index === ProductData.length - 1 && 'w-[65px] opacity-70'}`}
-                        />
-                        {index === ProductData.length - 1 && val.description === 'More' && <p className='text-xs font-semibold'>More</p>}
-                    </div>
-                ))}
+            <Link to={'/category'} className='pb-[20px] bg-[#f9d6c0]'>
+                <div className='grid grid-cols-5  justify-items-center bg-[#f9d6c0]'>
+                    {ProductData.map((val, index) => (
+                        <div key={index} className='text-center'>
+                            <img
+                                onClick={() => handleLinkClick(val.description)}
+                                src={val.img}
+                                alt="product"
+                                className={`w-[70px] ${index === ProductData.length - 1 && 'w-[65px] opacity-70'}`}
+                            />
+                            {index === ProductData.length - 1 && val.description === 'More' && <p className='text-xs font-semibold'>More</p>}
+                        </div>
+                    ))}
+                </div>
             </Link>
             <div className='flex justify-between items-center p-[12px_16px]'>
                 <h2 className='text-[#212121] font-semibold text-[17px]'>Recently Viewed Stores</h2>
@@ -209,9 +233,9 @@ export default function UserHome() {
                     </div>
                     <p className='text-[#333333] text-[12px] mt-1 text-center max-w-[100px]'>Mobiles</p>
                 </Link>
-                <Link to={'/category'} onClick={() => handleLinkClick('Electronics')} className='p-1 border-[1px] border-[rgb(204,204,204)] rounded'>
-                    <div className='w-[90px] h-[120px] p-1'>
-                        <img src={'https://rukminim2.flixcart.com/image/360/432/kz4gh3k0/headphone/f/v/b/-original-imagb7bmqzt7hn75.jpeg?q=60&crop=false'} alt='Laptop' className='w-full h-full object-cover' />
+                <Link to={'/category'} onClick={() => handleLinkClick('Smart Gadgest')} className='p-1 flex flex-col items-center border-[1px] border-[rgb(204,204,204)] rounded'>
+                    <div className='w-[100px] h-[120px] p-1'>
+                        <img src={'https://rukminim1.flixcart.com/image/418/502/xif0q/smartwatch/b/f/q/49-78-bxio2016-bxsm5004-android-ios-beatxp-yes-original-imagymy4x39afsvx.jpeg?q=60&crop=false'} alt='Laptop' className='w-full h-full object-cover' />
                     </div>
                     <p className='text-[#333333] text-[12px] mt-1 text-center max-w-[100px]'>Headphone & Earphone</p>
                 </Link>
@@ -261,6 +285,7 @@ export default function UserHome() {
                 </div>
             )}
             {error && <NoMoreProducts message={error.message} />}
+            {showPopup && <Popup status={status} onClose={closePopup} />}
         </div>
     )
 }

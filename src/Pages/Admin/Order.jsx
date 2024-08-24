@@ -89,20 +89,22 @@ const DynamicTable = ({ data }) => {
 
     return (
         <div className="table-responsive">
-            <table className="table table-striped table-bordered">
-                <thead className="thead-dark">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                     <tr>
-                        <th>Order ID</th>
-                        <th>Product Details</th>
-                        <th>Total Amount</th>
-                        <th>Customer Details</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Details</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Details</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Mode</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white divide-y divide-gray-200">
                     {data.map((order, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{order.orderId}</td>
-                            <td>
+                            <td className="px-6 py-4 whitespace-nowrap">{order.orderId}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
                                 {order.products.map((product, index) => (
                                     <div key={index}>
                                         <div><strong>Product Name:</strong> {product.productName}</div>
@@ -114,20 +116,24 @@ const DynamicTable = ({ data }) => {
                                     </div>
                                 ))}
                             </td>
-                            <td>{order.totalAmount}</td>
-                            <td>
+                            <td className="px-6 py-4 whitespace-nowrap">{order.totalAmount}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
                                 <div><strong>City:</strong> {order.customerDetail.city}</div>
                                 <div><strong>Phone Number:</strong> {order.customerDetail.phoneNumber}</div>
                                 <div><strong>Full Name:</strong> {order.customerDetail.fullName}</div>
                                 <div><strong>State:</strong> {order.customerDetail.state}</div>
                             </td>
+                            <td className={`px-6 py-4 whitespace-nowrap ${order.paymentStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                {order.paymentStatus}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">{order.paymentMode}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-
         </div>
     );
 };
+
 
 export default Order;
